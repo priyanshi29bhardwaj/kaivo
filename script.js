@@ -29,7 +29,8 @@ function runPreloader() {
   const counter = { v: 0 };
 
   /* hero waits behind, slightly scaled-in */
-  gsap.set(["#cabin", ".sky-video"], { scale: 1.12 });
+  gsap.set(["#cabin", "#shutter", ".sky-video"], { scale: 1.12 });
+  gsap.set("#shutter", { yPercent: 0 });
   gsap.set("#nav", { opacity: 0 });
   gsap.set(["#titleL", "#titleR"], { opacity: 0, y: 40 });
   gsap.set("#heroFg", { opacity: 0 });
@@ -46,7 +47,10 @@ function runPreloader() {
     /* FADE the veil */
     .to("#preloader", { opacity: 0, duration: 1.1, ease: "InOut" }, "-=.2")
     /* settle the cabin + reveal hero copy */
-    .to(["#cabin", ".sky-video"], { scale: 1, duration: 1.7, ease: "Out" }, "-=1.1")
+    .to(["#cabin", "#shutter", ".sky-video"], { scale: 1, duration: 1.7, ease: "Out" }, "-=1.1")
+    /* lift the window shutter up — its bottom lip + knob come to rest tucked
+       just under the top of the window frame (like a real raised shade) */
+    .to("#shutter", { yPercent: -68, duration: 3.4, ease: "InOut" }, "-=1.2")
     .to("#nav", { opacity: 1, duration: .9, ease: "Out" }, "-=1.3")
     .to(["#titleL", "#titleR"], { opacity: 1, y: 0, duration: 1.1, ease: "Out", stagger: .12 }, "-=1.2")
     .to("#heroFg", { opacity: 1, duration: 1, ease: "Out" }, "-=1")
@@ -96,10 +100,10 @@ function buildHero() {
   lenis.on("scroll", ({ scroll }) => {
     if (scroll > 10 && !_hidden) {
       _hidden = true;
-      gsap.to(["#titleL","#titleR","#heroFg","#nav"], { opacity: 0, duration: 0.25, ease: "power2.in", overwrite: true });
+      gsap.to(["#titleL","#titleR","#heroFg","#nav","#shutter"], { opacity: 0, duration: 0.25, ease: "power2.in", overwrite: true });
     } else if (scroll <= 10 && _hidden) {
       _hidden = false;
-      gsap.to(["#titleL","#titleR","#heroFg"], { opacity: 1, duration: 0.4, ease: "power2.out", overwrite: true });
+      gsap.to(["#titleL","#titleR","#heroFg","#shutter"], { opacity: 1, duration: 0.4, ease: "power2.out", overwrite: true });
       gsap.to("#nav",                           { opacity: 1, duration: 0.4, ease: "power2.out", overwrite: true });
     }
   });
@@ -114,24 +118,24 @@ function buildAbout() {
   el.innerHTML = words.map((w) => `<span class="word">${w}</span>`).join(" ");
   const spans = el.querySelectorAll(".word");
 
+  let prevLit = -1;
   ScrollTrigger.create({
-    trigger: el, start: "top 80%", end: "bottom 58%", scrub: true,
+    trigger: el, start: "top 75%", end: "bottom 90%", scrub: 0.5,
     onUpdate: (self) => {
       const lit = Math.round(self.progress * spans.length);
-      spans.forEach((s, i) => s.classList.toggle("is-on", i < lit));
+      if (lit === prevLit) return;
+      if (lit > prevLit) {
+        for (let i = prevLit < 0 ? 0 : prevLit; i < lit; i++) spans[i]?.classList.add("is-on");
+      } else {
+        for (let i = lit; i < prevLit; i++) spans[i]?.classList.remove("is-on");
+      }
+      prevLit = lit;
     },
   });
 
   gsap.fromTo(".about-s_inner", { y: "8vh" }, {
     y: "-8vh", ease: "none",
     scrollTrigger: { trigger: ".about-s", start: "top bottom", end: "bottom top", scrub: true },
-  });
-}
-
-function buildSections() {
-  gsap.utils.toArray(".section-title, .how-card, .adv-row, .stat, .cta-title").forEach((node) => {
-    gsap.from(node, { y: 40, opacity: 0, duration: 1, ease: "Out",
-      scrollTrigger: { trigger: node, start: "top 85%" } });
   });
 }
 
@@ -144,7 +148,6 @@ function boot() {
   if (v) v.play().catch(() => {});
   buildHero();
   buildAbout();
-  buildSections();
   runPreloader();
   ScrollTrigger.refresh();
 }
@@ -152,3 +155,21 @@ if (document.readyState === "complete") boot();
 else { window.addEventListener("load", boot); setTimeout(boot, 2500); }
 
 window.addEventListener("resize", () => ScrollTrigger.refresh());
+
+/* ---- Waitlist modal ---- */
+function openWaitlist() {
+  document.getElementById("wlBackdrop").classList.add("is-open");
+  document.getElementById("wlModal").classList.add("is-open");
+  document.body.style.overflow = "hidden";
+}
+function closeWaitlist() {
+  document.getElementById("wlBackdrop").classList.remove("is-open");
+  document.getElementById("wlModal").classList.remove("is-open");
+  document.body.style.overflow = "";
+}
+function submitWaitlist(e) {
+  e.preventDefault();
+  document.getElementById("wlForm").style.display = "none";
+  document.getElementById("wlSuccess").style.display = "block";
+}
+document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeWaitlist(); });
