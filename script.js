@@ -33,6 +33,18 @@ function shutterLift() {
   return -(((764 - 94) * scale / H) * 100 - 1);
 }
 
+/* knob rests on the glass just below the window's top inner edge (lifts less
+   than the shutter so the tab stays visible instead of tucking behind the frame) */
+function handleRest() {
+  const st = document.querySelector(".hero-stage");
+  if (!st || !st.clientHeight) return -69;
+  const H = st.clientHeight, W = st.clientWidth;
+  const scale = Math.max(W / 1672, H / 941);
+  // 115 sits the knob just below the window's top inner edge: tab peeks onto
+  // the glass while its base tucks behind the frame (Jesko-style)
+  return -(((764 - 110) * scale / H) * 100);
+}
+
 function runPreloader() {
   const num = document.getElementById("loadNum");
   const counter = { v: 0 };
@@ -40,7 +52,8 @@ function runPreloader() {
   /* hero waits behind, slightly scaled-in */
   gsap.set(["#cabin", "#shutter", ".sky-video"], { scale: 1.12 });
   gsap.set("#shutter", { yPercent: 0 });
-  /* handle is pre-positioned at its final resting spot and never moves */
+  /* knob starts at the same position as the shutter's knob so the swap is
+     seamless, then settles to handleRest after the panel disappears */
   gsap.set("#shutterHandle", { yPercent: shutterLift });
   gsap.set("#nav", { opacity: 0 });
   gsap.set(["#titleL", "#titleR"], { opacity: 0, y: 40 });
@@ -61,9 +74,11 @@ function runPreloader() {
     .to(["#cabin", "#shutter", ".sky-video"], { scale: 1, duration: 1.7, ease: "Out" }, "-=1.1")
     /* lift only the shutter panel — handle is already at its fixed position */
     .to("#shutter", { yPercent: () => shutterLift(), duration: 3.4, ease: "InOut" }, "-=1.2")
-    /* swap: panel gone, knob-only layer stays — panel can never reappear during zoom */
+    /* swap: panel gone, knob-only layer takes over at same position — no jump */
     .set("#shutter", { opacity: 0 })
     .set("#shutterHandle", { opacity: 1 })
+    /* settle the knob down to its visible rest position */
+    .to("#shutterHandle", { yPercent: () => handleRest(), duration: 0.35, ease: "Out" })
     .to("#nav", { opacity: 1, duration: .9, ease: "Out" }, "-=1.3")
     .to(["#titleL", "#titleR"], { opacity: 1, y: 0, duration: 1.1, ease: "Out", stagger: .12 }, "-=1.2")
     .to("#heroFg", { opacity: 1, duration: 1, ease: "Out" }, "-=1")
@@ -88,6 +103,9 @@ function buildHero() {
     scrollTrigger: { trigger: ".hero_scroll-area", start: "top top", end: "bottom bottom", scrub: true },
   })
     .to("#cabin",          { scale: 9,    ease: "none", duration: .6 }, 0)
+    /* knob clip flies through glued to the cabin window, then fades */
+    .to("#handleClip",     { scale: 9,    ease: "none", duration: .6 }, 0)
+    .to("#shutterHandle",  { opacity: 0,  ease: "none", duration: .22 }, .3)
     .to(".sky-video",      { scale: 1.12, ease: "none", duration: .9 }, 0);
 
   /* CONTINUOUS DESCENT — objectPosition pans through the video altitude.
@@ -108,20 +126,17 @@ function buildHero() {
     { opacity: 0, ease: "none",
       scrollTrigger: { trigger: ".hero_scroll-area", start: "84% top", end: "bottom top", scrub: 2 } });
 
-  /* handle fades out only after cabin has fully zoomed through */
-  gsap.to("#shutterHandle", { opacity: 0, ease: "none",
-    scrollTrigger: { trigger: ".hero_scroll-area", start: "45% top", end: "58% top", scrub: true } });
-
-  /* Text/UI vanishes instantly the moment any scroll happens */
+  /* Text/UI vanishes on scroll — hysteresis band prevents oscillation at boundary */
   let _hidden = false;
   lenis.on("scroll", ({ scroll }) => {
-    if (scroll > 10 && !_hidden) {
+    if (scroll > 20 && !_hidden) {
       _hidden = true;
-      gsap.to(["#titleL","#titleR","#heroFg","#nav"], { opacity: 0, duration: 0.25, ease: "power2.in", overwrite: true });
-    } else if (scroll <= 10 && _hidden) {
+      gsap.to(["#titleL","#heroFg","#nav"], { opacity: 0, duration: 0.25, ease: "power2.in", overwrite: true });
+    } else if (scroll < 5 && _hidden) {
       _hidden = false;
-      gsap.to(["#titleL","#titleR","#heroFg"], { opacity: 1, duration: 0.4, ease: "power2.out", overwrite: true });
-      gsap.to("#nav",                           { opacity: 1, duration: 0.4, ease: "power2.out", overwrite: true });
+      gsap.to(["#titleL","#heroFg"], { opacity: 1, duration: 0.4, ease: "power2.out", overwrite: true });
+      gsap.to("#nav",                { opacity: 1, duration: 0.4, ease: "power2.out", overwrite: true });
+      gsap.to("#shutterHandle",      { opacity: 1, duration: 0.3, ease: "power2.out", overwrite: true });
     }
   });
 }

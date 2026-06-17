@@ -21,7 +21,7 @@
       </div>
       <p class="preloader_tag">Stop Doing. Start Delegating.</p>
     </div>
-    <div class="preloader_count"><span id="loadNum">0</span>%</div>
+    <div class="preloader_count" style="display:none"><span id="loadNum">0</span>%</div>
   </div>
 
   <!-- ============ PERSISTENT ATMOSPHERE (stays behind every section through the descent) ============ -->
@@ -51,21 +51,22 @@
 
         <!-- window shutter — lifts on load, swapped for handle-only after -->
         <img class="shutter" id="shutter" src="assets/cabin-shutter.png?v=9" alt="" />
-        <img class="shutter" id="shutterHandle" src="assets/cabin-knob.png" alt="" style="opacity:0;" />
+        <!-- handle clip scales WITH the cabin so the knob stays glued to the
+             window during the fly-through; inner img carries the lift offset -->
+        <div class="handle-clip" id="handleClip">
+          <img id="shutterHandle" src="assets/cabin-knob.png" alt="" style="opacity:0;" />
+        </div>
 
         <!-- cabin (near) flies through, revealing the persistent fixed sky behind it -->
         <img class="cabin" id="cabin" src="assets/cabin-full copy.png" alt="" />
 
         <!-- big titles (jesko-style, fly apart) -->
-        <h2 class="title title--l" id="titleL">AI&nbsp;Powered<br />Conversational</h2>
-        <h2 class="title title--r" id="titleR">Travel&nbsp;Booking<br />Agent</h2>
+        <h2 class="title title--r" id="titleL">AI-Powered.<br />Conversational<br />Travel&nbsp;Booking<br />Agent</h2>
 
         <!-- bottom row -->
         <div class="hero-fg" id="heroFg">
           <div class="hero-lead">
-            <h3>Delegate<br />And Approve</h3>
-            <span class="rule"></span>
-            <p>Book a flight in 60&nbsp;seconds.</p>
+            <h3>Delegate And Approve:<br />Book a Flight in 60&nbsp;Seconds</h3>
           </div>
 
           <button class="btn-pill" onclick="openWaitlist()">

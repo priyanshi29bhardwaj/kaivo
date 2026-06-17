@@ -94,6 +94,16 @@ a{color:inherit;text-decoration:none}
   position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:1;
   transform-origin:49% 50%;will-change:transform;pointer-events:none;
 }
+/* clip layer scales with the cabin (z1, behind the frame); the inner img is
+   lifted so the knob rests on the glass at the top of the window */
+.handle-clip{
+  position:absolute;inset:0;z-index:1;
+  transform-origin:49% 50%;will-change:transform;pointer-events:none;
+}
+.handle-clip img{
+  position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
+  transform-origin:49% 50%;pointer-events:none;
+}
 
 /* near layer: cabin fills the screen, flies through to reveal the fixed sky */
 .cabin{
@@ -112,21 +122,21 @@ a{color:inherit;text-decoration:none}
 /* big titles */
 .title{
   position:absolute;z-index:6;pointer-events:none;
-  font-weight:700;line-height:.94;letter-spacing:-.03em;color:#fff;
-  font-size:clamp(1.7rem,3.4vw,3.4rem);
+  font-weight:700;line-height:1.05;letter-spacing:-.02em;color:#fff;
+  font-size:clamp(1.7rem,3.1vw,3.2rem);
   text-shadow:0 4px 32px rgba(0,0,0,.55);will-change:transform,opacity;
 }
 .title--l{top:18vh;left:clamp(1.2rem,3.5vw,3.4rem);text-align:left;transform-origin:left top}
-.title--r{bottom:18vh;right:clamp(1.2rem,3.5vw,3.4rem);text-align:left;transform-origin:right bottom}
+.title--r{top:16vh;right:clamp(1.8rem,4vw,4rem);text-align:left;transform-origin:right top;max-width:22rem}
 
 /* foreground bottom row */
 .hero-fg{position:absolute;inset:0;z-index:8;pointer-events:none;will-change:opacity}
 .hero-lead{
-  position:absolute;left:clamp(4rem,7vw,8rem);bottom:7vh;pointer-events:auto;
+  position:absolute;left:clamp(1.2rem,3.5vw,3.4rem);bottom:7vh;pointer-events:auto;
   padding:1.2rem 1.6rem 1.2rem 0;
 }
 .hero-lead h3{
-  font-size:clamp(2.2rem,3.5vw,3.4rem);font-weight:800;line-height:1.02;
+  font-size:clamp(1.8rem,2.8vw,2.8rem);font-weight:800;line-height:1.05;
   text-shadow:0 2px 24px rgba(0,0,0,.8),0 0 60px rgba(0,0,0,.5);
 }
 .hero-lead .rule{display:block;width:64px;height:1px;background:rgba(255,255,255,.7);margin:1rem 0}
