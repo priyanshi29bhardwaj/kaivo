@@ -157,11 +157,11 @@ a{color:inherit;text-decoration:none}
 .btn-pill:hover{transform:translateX(-50%) translateY(-2px);background:rgba(255,255,255,0.2)}
 .btn-pill_ico{width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,0.22);color:#fff;display:grid;place-items:center}
 .hero-scroll{
-  position:absolute;left:62%;right:0;bottom:0;
+  position:absolute;left:62%;right:0;bottom:7vh;
   display:flex;flex-direction:column;
   font-size:.72rem;letter-spacing:.18em;text-transform:uppercase;font-weight:700;color:#fff;
 }
-.hero-scroll_rule{display:block;width:100%;height:1px;background:rgba(255,255,255,.35)}
+.hero-scroll_rule{display:block;margin-left:clamp(1.2rem,3.5vw,3.4rem);width:calc(100% - clamp(1.2rem,3.5vw,3.4rem));height:1px;background:rgba(255,255,255,.35)}
 .hero-scroll_bar{
   display:flex;align-items:center;justify-content:space-between;
   padding:.55rem clamp(1.2rem,3.5vw,3.4rem);
