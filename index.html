@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css?v=18" />
+  <link rel="stylesheet" href="style.css?v=22" />
 </head>
 <body>
 
@@ -49,8 +49,9 @@
     <div class="hero-w">
       <div class="hero-stage">
 
-        <!-- window shutter — sits in the window opening, lifts up on load -->
-        <img class="shutter" id="shutter" src="assets/cabin-shutter.png?v=4" alt="" />
+        <!-- window shutter — lifts on load, swapped for handle-only after -->
+        <img class="shutter" id="shutter" src="assets/cabin-shutter.png?v=9" alt="" />
+        <img class="shutter" id="shutterHandle" src="assets/cabin-knob.png" alt="" style="opacity:0;" />
 
         <!-- cabin (near) flies through, revealing the persistent fixed sky behind it -->
         <img class="cabin" id="cabin" src="assets/cabin-full copy.png" alt="" />
@@ -75,9 +76,14 @@
           </button>
 
           <div class="hero-scroll">
-            <span class="hero-scroll_chev"></span>
-            <span class="hero-scroll_line"></span>
-            <span><b>Scroll Down</b> <i>To Start The Journey</i></span>
+            <span class="hero-scroll_rule"></span>
+            <div class="hero-scroll_bar">
+              <div class="hero-scroll_left">
+                <span class="hero-scroll_chev"></span>
+                <span class="hero-scroll_label">Scroll Down</span>
+              </div>
+              <span class="hero-scroll_right">To Start The Journey</span>
+            </div>
           </div>
         </div>
 
@@ -155,6 +161,6 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/CustomEase.min.js"></script>
   <script src="https://unpkg.com/@studio-freight/lenis@1.0.42/dist/lenis.min.js"></script>
-  <script src="script.js?v=18"></script>
+  <script src="script.js?v=28"></script>
 </body>
 </html>

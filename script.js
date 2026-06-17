@@ -24,6 +24,15 @@ document.documentElement.style.overflow = "hidden";
 /* ---------------------------------------------------------
    FRAME 0 — PRELOADER (fades out, no lift)
 --------------------------------------------------------- */
+function shutterLift() {
+  const st = document.querySelector(".hero-stage");
+  if (!st || !st.clientHeight) return -68;
+  const H = st.clientHeight, W = st.clientWidth;
+  const scale = Math.max(W / 1672, H / 941);
+  // 94 = window top row, 764 = knob top row; subtract small offset to sit just inside the frame
+  return -(((764 - 94) * scale / H) * 100 - 1);
+}
+
 function runPreloader() {
   const num = document.getElementById("loadNum");
   const counter = { v: 0 };
@@ -31,6 +40,8 @@ function runPreloader() {
   /* hero waits behind, slightly scaled-in */
   gsap.set(["#cabin", "#shutter", ".sky-video"], { scale: 1.12 });
   gsap.set("#shutter", { yPercent: 0 });
+  /* handle is pre-positioned at its final resting spot and never moves */
+  gsap.set("#shutterHandle", { yPercent: shutterLift });
   gsap.set("#nav", { opacity: 0 });
   gsap.set(["#titleL", "#titleR"], { opacity: 0, y: 40 });
   gsap.set("#heroFg", { opacity: 0 });
@@ -48,9 +59,11 @@ function runPreloader() {
     .to("#preloader", { opacity: 0, duration: 1.1, ease: "InOut" }, "-=.2")
     /* settle the cabin + reveal hero copy */
     .to(["#cabin", "#shutter", ".sky-video"], { scale: 1, duration: 1.7, ease: "Out" }, "-=1.1")
-    /* lift the window shutter up — its bottom lip + knob come to rest tucked
-       just under the top of the window frame (like a real raised shade) */
-    .to("#shutter", { yPercent: -68, duration: 3.4, ease: "InOut" }, "-=1.2")
+    /* lift only the shutter panel — handle is already at its fixed position */
+    .to("#shutter", { yPercent: () => shutterLift(), duration: 3.4, ease: "InOut" }, "-=1.2")
+    /* swap: panel gone, knob-only layer stays — panel can never reappear during zoom */
+    .set("#shutter", { opacity: 0 })
+    .set("#shutterHandle", { opacity: 1 })
     .to("#nav", { opacity: 1, duration: .9, ease: "Out" }, "-=1.3")
     .to(["#titleL", "#titleR"], { opacity: 1, y: 0, duration: 1.1, ease: "Out", stagger: .12 }, "-=1.2")
     .to("#heroFg", { opacity: 1, duration: 1, ease: "Out" }, "-=1")
@@ -74,8 +87,8 @@ function buildHero() {
   gsap.timeline({
     scrollTrigger: { trigger: ".hero_scroll-area", start: "top top", end: "bottom bottom", scrub: true },
   })
-    .to("#cabin",     { scale: 9,    ease: "none", duration: .6 }, 0)
-    .to(".sky-video", { scale: 1.12, ease: "none", duration: .9 }, 0);
+    .to("#cabin",          { scale: 9,    ease: "none", duration: .6 }, 0)
+    .to(".sky-video",      { scale: 1.12, ease: "none", duration: .9 }, 0);
 
   /* CONTINUOUS DESCENT — objectPosition pans through the video altitude.
      scrub:1.5 adds gentle lag-smoothing to eliminate micro-jank. */
@@ -95,15 +108,19 @@ function buildHero() {
     { opacity: 0, ease: "none",
       scrollTrigger: { trigger: ".hero_scroll-area", start: "84% top", end: "bottom top", scrub: 2 } });
 
+  /* handle fades out only after cabin has fully zoomed through */
+  gsap.to("#shutterHandle", { opacity: 0, ease: "none",
+    scrollTrigger: { trigger: ".hero_scroll-area", start: "45% top", end: "58% top", scrub: true } });
+
   /* Text/UI vanishes instantly the moment any scroll happens */
   let _hidden = false;
   lenis.on("scroll", ({ scroll }) => {
     if (scroll > 10 && !_hidden) {
       _hidden = true;
-      gsap.to(["#titleL","#titleR","#heroFg","#nav","#shutter"], { opacity: 0, duration: 0.25, ease: "power2.in", overwrite: true });
+      gsap.to(["#titleL","#titleR","#heroFg","#nav"], { opacity: 0, duration: 0.25, ease: "power2.in", overwrite: true });
     } else if (scroll <= 10 && _hidden) {
       _hidden = false;
-      gsap.to(["#titleL","#titleR","#heroFg","#shutter"], { opacity: 1, duration: 0.4, ease: "power2.out", overwrite: true });
+      gsap.to(["#titleL","#titleR","#heroFg"], { opacity: 1, duration: 0.4, ease: "power2.out", overwrite: true });
       gsap.to("#nav",                           { opacity: 1, duration: 0.4, ease: "power2.out", overwrite: true });
     }
   });

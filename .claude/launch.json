@@ -1,6 +1,6 @@
 {
   "version": "0.0.1",
   "configurations": [
-    { "name": "kaivo", "runtimeExecutable": "python3", "runtimeArgs": ["-m", "http.server", "5050"], "port": 5050 }
+    { "name": "kaivo", "runtimeExecutable": "npx", "runtimeArgs": ["serve", "-p", "5050"], "port": 5050 }
   ]
 }
